@@ -1,0 +1,8 @@
+backups/ 
+data/outputs/ 
+.gradle/ 
+.idea/ 
+.vscode/ 
+.metadata/ 
+"*.tmp" 
+"*.log" 
