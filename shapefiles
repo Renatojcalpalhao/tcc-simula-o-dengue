@@ -1,0 +1,22 @@
+https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/_SBC.aspx
+
+global {
+    // Substituir pelo caminho do  shapefile
+    file shapefile_santo_amaro <- file("../data/shapes/Distritos_Santo_Amaro.shp");
+    geometry santo_amaro_real;
+    
+    init {
+        if (exists(shapefile_santo_amaro)) {
+            // Carrega apenas o distrito Santo Amaro
+            create bairro_real from: shapefile_santo_amaro {
+                where (read("NOME_DIST") = "SANTO AMARO"); // Ajuste o nome do campo
+                nome <- string(read("NOME_DIST"));
+                area <- shape.area;
+                populacao <- int(read("POPULACAO")); // Se disponível
+                geometria <- shape;
+            }
+            santo_amaro_real <- first(bairro_real).geometria;
+            write "✅ Shapefile real de Santo Amaro carregado!";
+        }
+    }
+}

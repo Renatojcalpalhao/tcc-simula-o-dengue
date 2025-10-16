@@ -1,0 +1,7 @@
+# Fontes de casos de dengue
+FONTES_SAUDE = {
+    "datasus": "http://tabnet.datasus.gov.br/",
+    "prefeitura_sp": "https://www.prefeitura.sp.gov.br/covap/",
+    "sinan": "Sistema de Informação de Agravos de Notificação",
+    "sivep": "Sistema de Informação da Vigilância Epidemiológica"
+}

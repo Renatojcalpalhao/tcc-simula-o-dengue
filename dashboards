@@ -1,0 +1,87 @@
+experiment dashboard_apresentacao type: gui {
+    output {
+        display dashboard_profissional {
+            layout: grid(2, 2);
+            
+            // Célula 1: Mapa Interativo
+            display "mapa_interativo" at: {0, 0} size: {500, 400} {
+                species area_risco aspect: visual;
+                species humanos aspect: base;
+                species mosquitos aspect: base;
+                
+                // Controles interativos
+                graphics "controles" {
+                    draw rectangle(120, 60) at: {10, 350} color: #white border: #black opacity: 0.9;
+                    draw "🎯 CONTROLES" at: {15, 370} color: #darkblue size: 10;
+                    draw "⏸️ Pausar (P)" at: {15, 355} color: #black size: 8;
+                    draw "📊 Métricas (M)" at: {15, 345} color: #black size: 8;
+                }
+            }
+            
+            // Célula 2: Gráficos em Tempo Real
+            display "graficos_tempo_real" at: {1, 0} size: {500, 400} {
+                layout: vertical;
+                
+                chart "evolucao_casos" type: series {
+                    data "Infectados" value: total_infectados_h color: #red;
+                    data "Previsão IA" value: previsao_casos_30dias color: #purple style: dashed;
+                }
+                
+                chart "fatores_ambientais" type: series {
+                    data "Temperatura" value: temperatura_externa color: #orange;
+                    data "Precipitação" value: precipitacao / 5.0 color: #blue; // Escalado
+                    data "Umidade" value: umidade / 2.0 color: #green; // Escalado
+                }
+            }
+            
+            // Célula 3: Painel de Controle
+            display "painel_controle" at: {0, 1} size: {500, 300} {
+                layout: vertical;
+                
+                monitor "📍 SANTO AMARO - ZONA SUL/SP" value: "Simulação em Tempo Real" color: #darkblue;
+                monitor "👥 População" value: count(humanos) + " residentes";
+                monitor "🦟 Vetores" value: count(mosquitos) + " mosquitos";
+                monitor "🤒 Casos Ativos" value: total_infectados_h color: #red;
+                monitor "📈 R₀ Epidemiológico" value: r0_instantaneo color: 
+                    (r0_instantaneo > 1.5) ? #red : #green;
+                monitor "🔮 Previsão IA (30 dias)" value: previsao_casos_30dias color: #purple;
+                monitor "🌡️ Condições Climáticas" value: temperatura_externa + "°C, " + precipitacao + "mm";
+                
+                // Botões de intervenção
+                graphics "intervencoes" {
+                    draw rectangle(400, 40) at: {250, 270} color: #lightblue border: #blue {
+                        draw "🔄 INTERVENÇÕES: " at: {10, 25} color: #darkblue size: 10;
+                        draw "💊 Campanha Saúde" at: {120, 25} color: #green size: 9;
+                        draw "🧴 Aplicação Inseticida" at: {250, 25} color: #orange size: 9;
+                        draw "🚮 Limpeza Criadouros" at: {380, 25} color: #red size: 9;
+                    }
+                }
+            }
+            
+            // Célula 4: Análise de Impacto
+            display "analise_impacto" at: {1, 1} size: {500, 300} {
+                layout: vertical;
+                
+                chart "eficacia_intervencoes" type: bar {
+                    data "Sem Ação" value: previsao_casos_30dias color: #red;
+                    data "Com Campanhas" value: int(previsao_casos_30dias * 0.7) color: #yellow;
+                    data "Intervenção Total" value: int(previsao_casos_30dias * 0.4) color: #green;
+                }
+                
+                monitor "💡 CUSTO-BENEFÍCIO" value: "Intervenção preventiva = -60% casos";
+                monitor "🏥 ECONOMIA SAÚDE" value: "R$ " + int(previsao_casos_30dias * 0.6 * 1500);
+                monitor "⏱️ TEMPO RESPOSTA" value: "7-10 dias para impacto";
+            }
+        }
+    }
+    
+    // Teclas de atalho para apresentação
+    reflex key_pressed when: (current_key = "P") {
+        pause;
+        write "⏸️ Simulação pausada - Modo Apresentação";
+    }
+    
+    reflex key_pressed when: (current_key = "R") {
+        write "▶️ Retomando simulação";
+    }
+}

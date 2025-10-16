@@ -1,0 +1,67 @@
+# ml_predictor.py
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+import joblib
+
+class DenguePredictor:
+    def __init__(self):
+        self.model = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.treinado = False
+        
+    def treinar_com_dados_historicos(self):
+        """Treina com dados históricos de SP"""
+        # Dados históricos de dengue (exemplo)
+        dados = pd.DataFrame({
+            'temperatura': [25, 28, 30, 26, 27, 29, 31, 24],
+            'precipitacao': [50, 80, 120, 30, 60, 90, 150, 20],
+            'umidade': [70, 75, 80, 65, 72, 78, 82, 60],
+            'casos_1_mes': [10, 25, 45, 8, 18, 35, 55, 5],
+            'casos_2_meses': [5, 12, 25, 4, 10, 20, 35, 3]
+        })
+        
+        X = dados[['temperatura', 'precipitacao', 'umidade', 'casos_2_meses']]
+        y = dados['casos_1_mes']
+        
+        self.model.fit(X, y)
+        self.treinado = True
+        joblib.dump(self.model, 'modelo_dengue.pkl')
+        
+    def prever_proximos_casos(self, condições_atual, casos_recentes):
+        if not self.treinado:
+            self.treinado = True  # Ou carregar modelo salvo
+            
+        previsao = self.model.predict([[
+            condições_atual['temperatura'],
+            condições_atual['precipitacao'], 
+            condições_atual['umidade'],
+            casos_recentes
+        ]])
+        
+        return max(0, int(previsao[0]))
+        
+        
+        global {
+    python predictor <- python("ml_predictor", "DenguePredictor");
+    int previsao_casos_30dias <- 0;
+    
+    reflex prever_surto {
+        if (cycle % 168 == 0) { // A cada semana
+            map<string, float> condicoes <- [
+                "temperatura": temperatura_externa,
+                "precipitacao": precipitacao,
+                "umidade": umidade
+            ];
+            
+            int casos_ultimos_60dias <- total_infectados_h + total_recuperados;
+            
+            previsao_casos_30dias <- predictor.prever_proximos_casos(
+                condicoes, 
+                casos_ultimos_60dias
+            );
+            
+            write "🔮 PREVISÃO IA: " + previsao_casos_30dias + " casos nos próximos 30 dias";
+        }
+    }
+}
